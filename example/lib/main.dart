@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,10 +60,12 @@ class _MyPageState extends State<MyPage> {
               onPressed: () async {
                 if(await canReadStorage()){
                   var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-                  final result=await RScan.scanImagePath(image.path);
-                  setState(() {
-                    this.result = result;
-                  });
+                  if(image!=null){
+                    final result=await RScan.scanImagePath(image.path);
+                    setState(() {
+                      this.result = result;
+                    });
+                  }
                 }
               },
               child: Text('选择图片扫描'),
@@ -96,6 +100,7 @@ class _MyPageState extends State<MyPage> {
   }
 
   Future<bool> canReadStorage() async {
+    if(Platform.isIOS) return true;
     var status = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.storage);
     if (status != PermissionStatus.granted) {
