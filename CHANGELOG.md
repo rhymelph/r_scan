@@ -1,3 +1,4 @@
-## 0.0.1
+## 0.0.1 init project,and android platform finish.
 
-* TODO: Describe initial release.
+## 0.1.0 add ios platform and finish.
+

@@ -1,17 +1,73 @@
 # r_scan
+[![pub package](https://img.shields.io/pub/v/r_scan.svg)](https://pub.dartlang.org/packages/r_scan)
 
-A flutter plugin about qr code scan.
+A flutter plugin about qr code scan , it can scan from file、url、memory and camera qr code.Welcome to feedback your issue.
 
 ## Getting Started
 
 ###  Depend on it
 
 Add this to your package's pubspec.yaml file:
-
 ```yaml
 dependencies:
-  r_scan: ^0.0.1
+  r_scan: last version
 ```
+
+### Android Platform
+require `read storage permission` and `camera permission`, use `permission_handler` plugin.
+```dart
+import 'package:permission_handler/permission_handler.dart';
+
+Future<bool> canReadStorage() async {
+    if(Platform.isIOS) return true;
+    var status = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
+    if (status != PermissionStatus.granted) {
+      var future = await PermissionHandler()
+          .requestPermissions([PermissionGroup.storage]);
+      for (final item in future.entries) {
+        if (item.value != PermissionStatus.granted) {
+          return false;
+        }
+      }
+    } else {
+      return true;
+    }
+    return true;
+  }
+
+Future<bool> canOpenCamera() async {
+    var status =
+        await PermissionHandler().checkPermissionStatus(PermissionGroup.camera);
+    if (status != PermissionStatus.granted) {
+      var future = await PermissionHandler()
+          .requestPermissions([PermissionGroup.camera]);
+      for (final item in future.entries) {
+        if (item.value != PermissionStatus.granted) {
+          return false;
+        }
+      }
+    } else {
+      return true;
+    }
+    return true;
+  }
+```
+
+### IOS Platform
+add the permissions in your Info.plist
+```plist
+    <key>NSCameraUsageDescription</key>
+	<string>扫描二维码时需要使用您的相机</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>扫描二维码时需要访问您的相册</string>
+	<key>io.flutter.embedded_views_preview</key>
+    <true/>
+```
+no another.
+
+
+## Usage
 1.scan Image File
 
 ```dart
