@@ -22,6 +22,7 @@ class RScan {
       await _channel.invokeMethod('scanImagePath', {
         "path": path,
       });
+
   /// scan qr image in url
   ///
   /// [url] your qr image url
@@ -31,6 +32,7 @@ class RScan {
       await _channel.invokeMethod('scanImageUrl', {
         "url": url,
       });
+
   /// scan qr image in memory
   ///
   /// [uint8list] your qr image memory
@@ -102,6 +104,7 @@ class _RScanViewState extends State<RScanView> {
     }
   }
 }
+
 /// qr scan view controller .
 /// can startScan or stopScan .
 class RScanController extends ChangeNotifier {
@@ -139,6 +142,24 @@ class RScanController extends ChangeNotifier {
   Future<void> stopScan() async {
     await _methodChannel.invokeMethod('stopScan');
   }
+
+  /// flash mode open or close.
+  ///
+  /// [isOpen] if false will close flash mode.
+  ///
+  /// It will return is success.
+  Future<bool> setFlashMode(bool isOpen) async =>
+      await _methodChannel.invokeMethod('setFlashMode', {
+        'isOpen': isOpen,
+      });
+
+  /// flash mode open or close.
+  ///
+  /// [isOpen] if false will close flash mode.
+  ///
+  /// It will return is success.
+  Future<bool> getFlashMode() async =>
+      await _methodChannel.invokeMethod('getFlashMode');
 
   void detach() {
     _subscription?.cancel();

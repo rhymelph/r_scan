@@ -49,7 +49,7 @@ public class RScanPlugin implements MethodCallHandler {
             scanHelper.scanImageUrl(call,result);
         } else if(call.method.equals("scanImageMemory")){
             scanHelper.scanImageMemory(call,result);
-        }else {
+        } else {
             result.notImplemented();
         }
     }

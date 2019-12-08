@@ -43,6 +43,7 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
     private EventChannel.EventSink eventSink;
     private long lastCurrentTimestamp = 0L;//最后一次的扫描
     private MethodChannel methodChannel;
+    private Preview mPreview;
 
     public FlutterRScanView(Context context, BinaryMessenger messenger, int i, Object o) {
         Map map = (Map) o;
@@ -55,7 +56,10 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
         methodChannel.setMethodCallHandler(this);
         textureView = new TextureView(context);
         lifecycleRegistry = new LifecycleRegistry(this);
-        CameraX.bindToLifecycle(this, buildPreView(), buildImageAnalysis());
+        mPreview = buildPreView();
+
+        CameraX.bindToLifecycle(this, mPreview, buildImageAnalysis());
+
     }
 
     @Override
@@ -88,6 +92,14 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
             case "stopScan":
                 isPlay = false;
                 result.success(null);
+                break;
+            case "setFlashMode":
+                boolean isOpen = methodCall.argument("isOpen");
+                mPreview.enableTorch(isOpen);
+                result.success(true);
+                break;
+            case "getFlashMode":
+                result.success(mPreview.isTorchOn());
                 break;
             default:
                 result.notImplemented();

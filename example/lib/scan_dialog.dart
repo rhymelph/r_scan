@@ -41,10 +41,18 @@ class _RScanDialogState extends State<RScanDialog> {
           future: canOpenCameraView(),
           builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
             if (snapshot.hasData && snapshot.data == true) {
-              return ScanImageView(
-                child: RScanView(
-                  controller: _controller,
-                ),
+              return Stack(
+                children: <Widget>[
+                  ScanImageView(
+                    child: RScanView(
+                      controller: _controller,
+                    ),
+                  ),
+                  Positioned(
+                      top: 16,
+                      right: 16,
+                      child: FutureBuilder(future: getFlashMode(),builder: _buildFlashBtn,))
+                ],
               );
             } else {
               return Container();
@@ -53,6 +61,17 @@ class _RScanDialogState extends State<RScanDialog> {
         ),
       ),
     );
+  }
+
+  Future<bool> getFlashMode()async{
+    bool isOpen = false;
+    try{
+      isOpen = await _controller.getFlashMode();
+
+    }catch(_){
+
+    }
+    return isOpen;
   }
 
   Future<bool> canOpenCameraView() async {
@@ -70,6 +89,18 @@ class _RScanDialogState extends State<RScanDialog> {
       return true;
     }
     return true;
+  }
+
+  Widget _buildFlashBtn(BuildContext context, AsyncSnapshot<bool> snapshot) {
+    return snapshot.hasData?IconButton(icon: Icon(snapshot.data?Icons.flash_on:Icons.flash_off),color: Colors.white, onPressed: (){
+      if(snapshot.data){
+        _controller.setFlashMode(false);
+      }else{
+        _controller.setFlashMode(true);
+      }
+      setState(() {});
+    }):Container();
+
   }
 }
 
@@ -92,6 +123,12 @@ class _ScanImageViewState extends State<ScanImageView>
     controller = AnimationController(
         vsync: this, duration: Duration(milliseconds: 1000));
     controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
