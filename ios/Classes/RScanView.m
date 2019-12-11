@@ -13,6 +13,7 @@
 @property(nonatomic , strong)FlutterMethodChannel * _channel;
 @property(nonatomic , strong)FlutterRScanViewEventChannel * _event;
 @property(nonatomic , strong)AVCaptureVideoPreviewLayer * captureLayer;
+@property(nonatomic , strong)AVCaptureDevice * _device;
 
 - (void)onMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result;
 
@@ -30,7 +31,7 @@
 - (instancetype)initWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId arguments:(id)args binaryMessenger:(NSObject<FlutterBinaryMessenger> *)messenger{
     if(self = [super initWithFrame:frame]){
         
-       NSString * channelName=[NSString stringWithFormat:@"r_scan/com.rhyme/r_scan_view__%lld/method",viewId];
+       NSString * channelName=[NSString stringWithFormat:@"r_scan/com.rhyme/r_scan_view_%lld/method",viewId];
         self._channel=[FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:messenger];
         __weak __typeof__(self) weakSelf = self;
         [weakSelf._channel setMethodCallHandler:^(FlutterMethodCall * _Nonnull call, FlutterResult  _Nonnull result) {
@@ -40,7 +41,7 @@
         NSString * eventChannelName=[NSString stringWithFormat:@"r_scan/com.rhyme/r_scan_view_%lld/event",viewId];
         FlutterEventChannel * _evenChannel = [FlutterEventChannel eventChannelWithName:eventChannelName binaryMessenger:messenger];
         self._event=[FlutterRScanViewEventChannel new];
-        [self._event setRsView:self];
+//        [self._event setRsView:self];
         [_evenChannel setStreamHandler:self._event];
         
         AVCaptureVideoPreviewLayer * layer=[AVCaptureVideoPreviewLayer layerWithSession:self.session];
@@ -50,8 +51,8 @@
         [self.layer addSublayer:layer];
         layer.videoGravity=AVLayerVideoGravityResizeAspectFill;
         
-        AVCaptureDevice * device=[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        AVCaptureDeviceInput * input=[[AVCaptureDeviceInput alloc] initWithDevice:device error:nil];
+        self._device=[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+        AVCaptureDeviceInput * input=[[AVCaptureDeviceInput alloc] initWithDevice:self._device error:nil];
         AVCaptureMetadataOutput * output=[[AVCaptureMetadataOutput alloc]init];
         [self.session addInput:input];
         [self.session addOutput:output];
@@ -76,8 +77,17 @@
 -(void)onMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if ([call.method isEqualToString:@"startScan"]) {
         [self resume];
+        result(nil);
     }else if([call.method isEqualToString:@"stopScan"]){
         [self pause];
+        result(nil);
+    }else if ([call.method isEqualToString:@"setFlashMode"]){
+        NSNumber * isOpen = [call.arguments valueForKey:@"isOpen"];
+        result([NSNumber numberWithBool:[self setFlashMode:[isOpen boolValue]]]);
+    }else if ([call.method isEqualToString:@"getFlashMode"]){
+        result([NSNumber numberWithBool:[self getFlashMode]]);
+    }else {
+        result(FlutterMethodNotImplemented);
     }
 }
 
@@ -93,6 +103,33 @@
     }
 }
 
+-(BOOL)setFlashMode:(BOOL) isOpen{
+    [self._device lockForConfiguration:nil];
+    BOOL isSuccess = YES;
+    if ([self._device hasFlash]) {
+        if (isOpen) {
+            self._device.flashMode=AVCaptureFlashModeOn;
+            self._device.torchMode=AVCaptureTorchModeOn;
+        }else{
+            self._device.flashMode = AVCaptureFlashModeOff;
+            self._device.torchMode = AVCaptureTorchModeOff;
+        }
+    }else{
+        isSuccess=NO;
+    }
+    [self._device unlockForConfiguration];
+    
+    return isSuccess;
+    
+}
+-(BOOL)getFlashMode{
+    [self._device lockForConfiguration:nil];
+    BOOL isSuccess = self._device.flashMode==AVCaptureFlashModeOn&&
+    self._device.torchMode==AVCaptureTorchModeOn;
+    [self._device unlockForConfiguration];
+    return isSuccess;
+    
+}
 - (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
     if (metadataObjects.count>0) {
         AVMetadataMachineReadableCodeObject * metaObject=metadataObjects[0];
@@ -137,7 +174,5 @@
     }
 }
 
-- (void)setRsView:(RScanView *)rsView{
-    self.rsView=rsView;
-}
+
 @end

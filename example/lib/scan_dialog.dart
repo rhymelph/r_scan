@@ -15,18 +15,17 @@ class _RScanDialogState extends State<RScanDialog> {
     super.initState();
     initController();
   }
-  bool isFirst=true;
 
+  bool isFirst = true;
 
   Future<void> initController() async {
     _controller = RScanController();
     _controller.addListener(() {
-
       final result = _controller.result;
       if (result != null) {
-        if(isFirst){
+        if (isFirst) {
           Navigator.of(context).pop(result);
-          isFirst=false;
+          isFirst = false;
         }
       }
     });
@@ -48,10 +47,12 @@ class _RScanDialogState extends State<RScanDialog> {
                       controller: _controller,
                     ),
                   ),
-                  Positioned(
-                      top: 16,
-                      right: 16,
-                      child: FutureBuilder(future: getFlashMode(),builder: _buildFlashBtn,))
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: FutureBuilder(
+                        future: getFlashMode(),
+                        builder: _buildFlashBtn,
+                      ))
                 ],
               );
             } else {
@@ -63,14 +64,11 @@ class _RScanDialogState extends State<RScanDialog> {
     );
   }
 
-  Future<bool> getFlashMode()async{
+  Future<bool> getFlashMode() async {
     bool isOpen = false;
-    try{
+    try {
       isOpen = await _controller.getFlashMode();
-
-    }catch(_){
-
-    }
+    } catch (_) {}
     return isOpen;
   }
 
@@ -92,15 +90,23 @@ class _RScanDialogState extends State<RScanDialog> {
   }
 
   Widget _buildFlashBtn(BuildContext context, AsyncSnapshot<bool> snapshot) {
-    return snapshot.hasData?IconButton(icon: Icon(snapshot.data?Icons.flash_on:Icons.flash_off),color: Colors.white, onPressed: (){
-      if(snapshot.data){
-        _controller.setFlashMode(false);
-      }else{
-        _controller.setFlashMode(true);
-      }
-      setState(() {});
-    }):Container();
-
+    return snapshot.hasData
+        ? Padding(
+          padding:  EdgeInsets.only(bottom:24+MediaQuery.of(context).padding.bottom),
+          child: IconButton(
+              icon: Icon(snapshot.data ? Icons.flash_on : Icons.flash_off),
+              color: Colors.white,
+              iconSize: 46,
+              onPressed: () {
+                if (snapshot.data) {
+                  _controller.setFlashMode(false);
+                } else {
+                  _controller.setFlashMode(true);
+                }
+                setState(() {});
+              }),
+        )
+        : Container();
   }
 }
 

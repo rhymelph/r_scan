@@ -172,3 +172,18 @@ class _RScanDialogState extends State<RScanDialog> {
 }
 
 ```
+
+5. open flash lamp / get flash lamp status.
+You can use `RScanController` class.
+```dart
+//turn off the flash lamp.
+await _controller.setFlashMode(false);
+
+//turn on the flash lamp.
+await _controller.setFlashMode(true);
+
+// get the flash lamp status.
+
+bool isOpen = await _controller.getFlashMode();
+
+```
