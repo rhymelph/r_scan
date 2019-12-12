@@ -2,11 +2,14 @@ package com.rhyme.r_scan;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
 import android.view.TextureView;
 import android.view.View;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.CameraX;
@@ -36,6 +39,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
 public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
+    private static final String TAG="FlutterRScanView";
+
     private LifecycleRegistry lifecycleRegistry;
     private TextureView textureView;
     private boolean isPlay;
@@ -56,8 +61,12 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
         methodChannel.setMethodCallHandler(this);
         textureView = new TextureView(context);
         lifecycleRegistry = new LifecycleRegistry(this);
-        mPreview = buildPreView();
+        DisplayMetrics outMetrics = new DisplayMetrics();
 
+        WindowManager manager= (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        manager.getDefaultDisplay().getMetrics(outMetrics);
+        Log.d(TAG, "FlutterRScanView: "+outMetrics.toString());
+        mPreview = buildPreView(outMetrics.widthPixels,outMetrics.heightPixels);
         CameraX.bindToLifecycle(this, mPreview, buildImageAnalysis());
 
     }
@@ -119,10 +128,10 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
         return lifecycleRegistry;
     }
 
-    private Preview buildPreView() {
+    private Preview buildPreView(int width , int height) {
         PreviewConfig config = new PreviewConfig.Builder()
-                .setTargetAspectRatio(Rational.ZERO)
-                .setTargetResolution(new Size(460, 460))
+                .setTargetAspectRatio(Rational.parseRational(width+":"+height))
+                .setTargetResolution(new Size(width, height))
                 .build();
         Preview preview = new Preview(config);
         preview.setOnPreviewOutputUpdateListener(new Preview.OnPreviewOutputUpdateListener() {
