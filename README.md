@@ -1,7 +1,7 @@
 # r_scan
 [![pub package](https://img.shields.io/pub/v/r_scan.svg)](https://pub.dartlang.org/packages/r_scan)
 
-A flutter plugin about qr code scan , it can scan from file、url、memory and camera qr code.Welcome to feedback your issue.
+A flutter plugin about qr code or bar code scan , it can scan from file、url、memory and camera qr code or bar code .Welcome to feedback your issue.
 
 ## Getting Started
 
