@@ -187,3 +187,21 @@ await _controller.setFlashMode(true);
 bool isOpen = await _controller.getFlashMode();
 
 ```
+
+6.RScanResult
+
+when you scan finish,will return the RScanResult...
+
+```dart
+class RScanResult {
+  /// barcode type
+  final RScanBarType type;
+
+  ///barcode message
+  final String message;
+
+  ///barcode points include [x , y]
+  final List<RScanPoint> points;
+}
+
+```
