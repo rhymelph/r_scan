@@ -69,7 +69,6 @@ public class ImageScanHelper extends ContextWrapper {
                     Bitmap bitmap = BitmapFactory.decodeFile(path);
                     int height = bitmap.getHeight();
                     int width = bitmap.getWidth();
-                    Log.d("result", "bitmap width:" + width + " height:" + height);
                     try {
                         Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
                         hints.put(DecodeHintType.CHARACTER_SET, "utf-8");
@@ -86,7 +85,7 @@ public class ImageScanHelper extends ContextWrapper {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                result.success(decode.getText());
+                                result.success(RScanResultUtils.toMap(decode));
                             }
                         });
                     } catch (Exception e) {
@@ -94,7 +93,7 @@ public class ImageScanHelper extends ContextWrapper {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                result.success("");
+                                result.success(null);
                             }
                         });
                     }
@@ -135,7 +134,6 @@ public class ImageScanHelper extends ContextWrapper {
                     }
                     int height = bitmap.getHeight();
                     int width = bitmap.getWidth();
-                    Log.d("result", "bitmap width:" + width + " height:" + height);
                     Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
                     hints.put(DecodeHintType.CHARACTER_SET, "utf-8");
                     hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
@@ -151,7 +149,7 @@ public class ImageScanHelper extends ContextWrapper {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            result.success(decode.getText());
+                            result.success(RScanResultUtils.toMap(decode));
                         }
                     });
                 } catch (Exception e) {
@@ -159,7 +157,7 @@ public class ImageScanHelper extends ContextWrapper {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            result.success("");
+                            result.success(null);
                         }
                     });
                 }
@@ -178,7 +176,6 @@ public class ImageScanHelper extends ContextWrapper {
                     bitmap = BitmapFactory.decodeByteArray(uint8list,0,uint8list.length);
                     int height = bitmap.getHeight();
                     int width = bitmap.getWidth();
-                    Log.d("result", "bitmap width:" + width + " height:" + height);
                     Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
                     hints.put(DecodeHintType.CHARACTER_SET, "utf-8");
                     hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
@@ -194,7 +191,7 @@ public class ImageScanHelper extends ContextWrapper {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            result.success(decode.getText());
+                            result.success(RScanResultUtils.toMap(decode));
                         }
                     });
                 } catch (Exception e) {
@@ -202,7 +199,7 @@ public class ImageScanHelper extends ContextWrapper {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            result.success("");
+                            result.success(null);
                         }
                     });
                 }

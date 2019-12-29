@@ -1,5 +1,7 @@
 #import "RScanPlugin.h"
 #import "FlutterRScanView.h"
+#import "RScanResult.h"
+
 @implementation RScanPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
@@ -38,26 +40,45 @@
     result([self getQrCode:data]);
 }
 
--(NSString *) getQrCode:(NSData *)data{
+-(NSDictionary *) getQrCode:(NSData *)data{
     if (data) {
         CIImage * detectImage=[CIImage imageWithData:data];
         CIDetector*detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
         NSArray* feature = [detector featuresInImage:detectImage options: nil];
         if(feature.count==0){
-            return @"";
+            return nil;
         }else{
             for(int index=0;index<[feature count];index ++){
                 CIQRCodeFeature * qrCode=[feature objectAtIndex:index];
                 NSString *resultStr=qrCode.messageString;
                 if(resultStr!=nil){
-                    NSLog(@"识别到的二维码内容为:%@",resultStr);
-                    return resultStr;
+                    NSMutableDictionary *dict =[NSMutableDictionary dictionary];
+                    [dict setValue:resultStr forKey:@"message"];
+                    [dict setValue:[RScanResult getType:AVMetadataObjectTypeQRCode] forKey:@"type"];
+                    NSMutableArray<NSDictionary *> * points = [NSMutableArray array];
+                    CGPoint topLeft=qrCode.topLeft;
+                    CGPoint topRight=qrCode.topRight;
+                    CGPoint bottomLeft=qrCode.bottomLeft;
+                    CGPoint bottomRight=qrCode.bottomRight;
+                    [points addObject:[self pointsToMap:topLeft]];
+                     [points addObject:[self pointsToMap:topRight]];
+                     [points addObject:[self pointsToMap:bottomLeft]];
+                     [points addObject:[self pointsToMap:bottomRight]];
+                    [dict setValue:points forKey:@"points"];
+                    return dict;
                 }
                 
             }
         }
     }
-    return @"";
+    return nil;
+}
+
+-(NSDictionary*) pointsToMap:(CGPoint) point{
+    NSMutableDictionary * dict = [NSMutableDictionary dictionary];
+    [dict setValue:@(point.x) forKey:@"X"];
+    [dict setValue:@(point.y) forKey:@"Y"];
+    return dict;
 }
 
 

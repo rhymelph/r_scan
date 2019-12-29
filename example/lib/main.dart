@@ -29,7 +29,7 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  String result;
+  RScanResult result;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,10 @@ class _MyPageState extends State<MyPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Center(child: Text(result == null ? '点击下方按钮开始扫码' : '扫码结果$result')),
+          Center(
+              child: Text(result == null
+                  ? '点击下方按钮开始扫码'
+                  : '扫码结果${result.toString().split(',').join('\n')}')),
           Center(
             child: FlatButton(
               onPressed: () async {
@@ -58,10 +61,11 @@ class _MyPageState extends State<MyPage> {
           Center(
             child: FlatButton(
               onPressed: () async {
-                if(await canReadStorage()){
-                  var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-                  if(image!=null){
-                    final result=await RScan.scanImagePath(image.path);
+                if (await canReadStorage()) {
+                  var image =
+                      await ImagePicker.pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    final result = await RScan.scanImagePath(image.path);
                     setState(() {
                       this.result = result;
                     });
@@ -74,7 +78,8 @@ class _MyPageState extends State<MyPage> {
           Center(
             child: FlatButton(
               onPressed: () async {
-                final result=await RScan.scanImageUrl("https://s.cn.bing.net/th?id=OJ.5F0gxqWmxskS0Q&w=75&h=75&pid=MSNJVFeeds");
+                final result = await RScan.scanImageUrl(
+                    "https://s.cn.bing.net/th?id=OJ.5F0gxqWmxskS0Q&w=75&h=75&pid=MSNJVFeeds");
                 setState(() {
                   this.result = result;
                 });
@@ -85,8 +90,9 @@ class _MyPageState extends State<MyPage> {
           Center(
             child: FlatButton(
               onPressed: () async {
-                ByteData data=await rootBundle.load('images/qrCode.png');
-                final result=await RScan.scanImageMemory(data.buffer.asUint8List());
+                ByteData data = await rootBundle.load('images/qrCode.png');
+                final result =
+                    await RScan.scanImageMemory(data.buffer.asUint8List());
                 setState(() {
                   this.result = result;
                 });
@@ -100,7 +106,7 @@ class _MyPageState extends State<MyPage> {
   }
 
   Future<bool> canReadStorage() async {
-    if(Platform.isIOS) return true;
+    if (Platform.isIOS) return true;
     var status = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.storage);
     if (status != PermissionStatus.granted) {

@@ -20,7 +20,7 @@
 @property(nonatomic , strong)FlutterEventSink events;
 @property(nonatomic , strong)RScanView* rsView;
 
--(void)getResult:(NSString *)msg;
+-(void)getResult:(NSDictionary *)msg;
 
 
 @end

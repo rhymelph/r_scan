@@ -7,6 +7,7 @@
 
 #import "RScanView.h"
 #import <AVFoundation/AVFoundation.h>
+#import "RScanResult.h"
 @interface RScanView()<AVCaptureMetadataOutputObjectsDelegate>
 
 @property(nonatomic , strong)AVCaptureSession * session;
@@ -60,9 +61,8 @@
         
         output.metadataObjectTypes=output.availableMetadataObjectTypes;
         [output setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
-        [output setMetadataObjectTypes:@[AVMetadataObjectTypeUPCECode, AVMetadataObjectTypeCode39Code, AVMetadataObjectTypeCode39Mod43Code,
-        AVMetadataObjectTypeEAN13Code, AVMetadataObjectTypeEAN8Code, AVMetadataObjectTypeCode93Code, AVMetadataObjectTypeCode128Code,
-        AVMetadataObjectTypePDF417Code, AVMetadataObjectTypeQRCode, AVMetadataObjectTypeAztecCode]];
+        [output setMetadataObjectTypes:@[AVMetadataObjectTypeAztecCode,AVMetadataObjectTypeCode39Code,
+                                         AVMetadataObjectTypeCode93Code,AVMetadataObjectTypeCode128Code, AVMetadataObjectTypeDataMatrixCode,AVMetadataObjectTypeEAN8Code,AVMetadataObjectTypeEAN13Code,AVMetadataObjectTypeITF14Code,AVMetadataObjectTypePDF417Code,AVMetadataObjectTypeQRCode,AVMetadataObjectTypeUPCECode]];
         
         [self.session startRunning];
     }
@@ -134,9 +134,8 @@
     if (metadataObjects.count>0) {
         AVMetadataMachineReadableCodeObject * metaObject=metadataObjects[0];
         NSString * value=metaObject.stringValue;
-        NSLog(@"扫描到的二维码为：%@",value);
         if(value.length&&self._event){
-            [self._event getResult:value];
+            [self._event getResult:[RScanResult toMap:metaObject]];
         }
     }
 }
@@ -168,7 +167,7 @@
     return nil;
 }
 
-- (void)getResult:(NSString *)msg{
+- (void)getResult:(NSDictionary *)msg{
     if(self.events){
         self.events(msg);
     }
