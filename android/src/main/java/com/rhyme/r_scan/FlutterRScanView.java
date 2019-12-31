@@ -39,7 +39,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
 public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
-    private static final String TAG="FlutterRScanView";
+    private static final String TAG = "FlutterRScanView";
 
     private LifecycleRegistry lifecycleRegistry;
     private TextureView textureView;
@@ -63,10 +63,10 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
         lifecycleRegistry = new LifecycleRegistry(this);
         DisplayMetrics outMetrics = new DisplayMetrics();
 
-        WindowManager manager= (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         manager.getDefaultDisplay().getMetrics(outMetrics);
-        Log.d(TAG, "FlutterRScanView: "+outMetrics.toString());
-        mPreview = buildPreView(outMetrics.widthPixels,outMetrics.heightPixels);
+        Log.d(TAG, "FlutterRScanView: " + outMetrics.toString());
+        mPreview = buildPreView(outMetrics.widthPixels, outMetrics.heightPixels);
         CameraX.bindToLifecycle(this, mPreview, buildImageAnalysis());
 
     }
@@ -128,9 +128,9 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
         return lifecycleRegistry;
     }
 
-    private Preview buildPreView(int width , int height) {
+    private Preview buildPreView(int width, int height) {
         PreviewConfig config = new PreviewConfig.Builder()
-                .setTargetAspectRatio(Rational.parseRational(width+":"+height))
+                .setTargetAspectRatio(Rational.parseRational(width + ":" + height))
                 .setTargetResolution(new Size(width, height))
                 .build();
         Preview preview = new Preview(config);
@@ -185,13 +185,14 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
                 BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
                 try {
                     final Result decode = reader.decode(binaryBitmap);
-                    Log.d(TAG, "analyze: decode:" + decode.toString());
-                    textureView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            eventSink.success(RScanResultUtils.toMap(decode));
-                        }
-                    });
+                    if (decode != null&&eventSink!=null) {
+                        textureView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                eventSink.success(RScanResultUtils.toMap(decode));
+                            }
+                        });
+                    }
                 } catch (Exception e) {
                     buffer.clear();
 //                    Log.d(TAG, "analyze: error ");
