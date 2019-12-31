@@ -189,6 +189,7 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
                         textureView.post(new Runnable() {
                             @Override
                             public void run() {
+                                if (eventSink!=null)
                                 eventSink.success(RScanResultUtils.toMap(decode));
                             }
                         });
