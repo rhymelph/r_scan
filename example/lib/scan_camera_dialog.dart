@@ -18,7 +18,7 @@ class _RScanCameraDialogState extends State<RScanCameraDialog> {
     super.initState();
     if (rScanCameras != null && rScanCameras.length > 0) {
       _controller = RScanCameraController(
-          rScanCameras[1], RScanCameraResolutionPreset.max)
+          rScanCameras[0], RScanCameraResolutionPreset.max)
         ..addListener(() {
           final result = _controller.result;
           if (result != null) {

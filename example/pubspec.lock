@@ -30,7 +30,7 @@ packages:
     source: hosted
     version: "1.0.5"
   camera:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: camera
       url: "https://pub.dev"
