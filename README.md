@@ -299,7 +299,7 @@ class _RScanDialogState extends State<RScanDialog> {
 
 ```
 
-5. open flash lamp / get flash lamp status.
+6. open flash lamp / get flash lamp status.
 You can use `RScanController` class.
 ```dart
 //turn off the flash lamp.
@@ -314,7 +314,7 @@ bool isOpen = await _controller.getFlashMode();
 
 ```
 
-6.RScanResult
+7. RScanResult
 
 when you scan finish,will return the RScanResult...
 
