@@ -68,7 +68,7 @@ no another.
 
 
 ## Usage
-1.scan Image File
+### 1.scan Image File
 
 ```dart
 
@@ -76,7 +76,7 @@ final result=await RScan.scanImagePath('your file path');
 
 ```
 
-2.scan Image url
+### 2.scan Image url
 
 ```dart
 
@@ -84,7 +84,7 @@ final result=await RScan.scanImagePath('your image url');
 
 ```
 
-3.scan Image memory
+### 3.scan Image memory
 
 ```dart
 
@@ -93,7 +93,7 @@ final result=await RScan.scanImagePath('your image url');
 
 ```
 
-4.scan camera(new! please upgrade this plugin to v0.1,4)
+### 4.scan camera(new! please upgrade this plugin to v0.1,4)
 
 - Step First: Get available cameras
 ```dart
@@ -213,7 +213,7 @@ class _RScanCameraDialogState extends State<RScanCameraDialog> {
 }
 ```
 
-5.scan view(Deprecated)
+### 5.scan view(Deprecated)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -299,7 +299,7 @@ class _RScanDialogState extends State<RScanDialog> {
 
 ```
 
-6. open flash lamp / get flash lamp status.
+### 6. open flash lamp / get flash lamp status.
 You can use `RScanController` class.
 ```dart
 //turn off the flash lamp.
@@ -314,7 +314,7 @@ bool isOpen = await _controller.getFlashMode();
 
 ```
 
-7. RScanResult
+### 7. RScanResult
 
 when you scan finish,will return the RScanResult...
 
