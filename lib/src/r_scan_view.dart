@@ -48,14 +48,14 @@ class _RScanViewState extends State<RScanView> {
     };
     Widget child;
     if (Platform.isAndroid) {
-      child= AndroidView(
+      child = AndroidView(
         viewType: _scanType,
         onPlatformViewCreated: onPlatformViewCreated,
         creationParams: params,
         creationParamsCodec: StandardMessageCodec(),
       );
     } else if (Platform.isIOS) {
-      child= UiKitView(
+      child = UiKitView(
         viewType: _scanType,
         onPlatformViewCreated: onPlatformViewCreated,
         creationParams: params,

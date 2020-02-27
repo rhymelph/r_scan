@@ -63,10 +63,11 @@ class RScanCameraController extends ValueNotifier<RScanCameraValue> {
 
   //处理返回值
   void _handleResult(event) {
-    if(_isDisposed) return;
+    if (_isDisposed) return;
     this.result = RScanResult.formMap(event);
     notifyListeners();
   }
+
   //开始扫描
   Future<void> startScan() async {
     await _channel.invokeMethod('startScan');
@@ -76,6 +77,7 @@ class RScanCameraController extends ValueNotifier<RScanCameraValue> {
   Future<void> stopScan() async {
     await _channel.invokeMethod('stopScan');
   }
+
   /// flash mode open or close.
   ///
   /// [isOpen] if false will close flash mode.

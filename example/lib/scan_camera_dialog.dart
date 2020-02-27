@@ -76,6 +76,7 @@ class _RScanCameraDialogState extends State<RScanCameraDialog> {
       ),
     );
   }
+
   Future<bool> getFlashMode() async {
     bool isOpen = false;
     try {
@@ -87,21 +88,21 @@ class _RScanCameraDialogState extends State<RScanCameraDialog> {
   Widget _buildFlashBtn(BuildContext context, AsyncSnapshot<bool> snapshot) {
     return snapshot.hasData
         ? Padding(
-      padding:  EdgeInsets.only(bottom:24+MediaQuery.of(context).padding.bottom),
-      child: IconButton(
-          icon: Icon(snapshot.data ? Icons.flash_on : Icons.flash_off),
-          color: Colors.white,
-          iconSize: 46,
-          onPressed: () {
-            if (snapshot.data) {
-              _controller.setFlashMode(false);
-            } else {
-              _controller.setFlashMode(true);
-            }
-            setState(() {});
-          }),
-    )
+            padding: EdgeInsets.only(
+                bottom: 24 + MediaQuery.of(context).padding.bottom),
+            child: IconButton(
+                icon: Icon(snapshot.data ? Icons.flash_on : Icons.flash_off),
+                color: Colors.white,
+                iconSize: 46,
+                onPressed: () {
+                  if (snapshot.data) {
+                    _controller.setFlashMode(false);
+                  } else {
+                    _controller.setFlashMode(true);
+                  }
+                  setState(() {});
+                }),
+          )
         : Container();
   }
-
 }

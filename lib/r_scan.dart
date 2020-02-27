@@ -10,7 +10,8 @@ export 'package:r_scan/src/r_scan_camera.dart';
 
 /// qr scan
 class RScan {
-  static const MethodChannel _channel = const MethodChannel('com.rhyme_lph/r_scan');
+  static const MethodChannel _channel =
+      const MethodChannel('com.rhyme_lph/r_scan');
 
   /// scan qr image in path
   ///
@@ -42,8 +43,6 @@ class RScan {
         "uint8list": uint8list,
       }));
 }
-
-
 
 /// barcode type
 enum RScanBarType {
@@ -104,7 +103,6 @@ class RScanResult {
   ///barcode points
   final List<RScanPoint> points;
 
-
   const RScanResult({this.type, this.message, this.points});
 
   factory RScanResult.formMap(Map map) {
@@ -143,6 +141,5 @@ class RScanResult {
           points == other.points;
 
   @override
-  int get hashCode =>
-      type.hashCode ^ message.hashCode ^ points.hashCode;
+  int get hashCode => type.hashCode ^ message.hashCode ^ points.hashCode;
 }
