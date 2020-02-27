@@ -7,7 +7,7 @@
 
 #import "FlutterRScanView.h"
 #import "RScanView.h"
-static NSString * scanViewType=@"com.rhyme/r_scan_view";
+static NSString * scanViewType=@"com.rhyme_lph/r_scan_view";
 
 @implementation FlutterRScanViewFactory{
  

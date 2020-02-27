@@ -33,33 +33,31 @@ class _RScanDialogState extends State<RScanDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: FutureBuilder<bool>(
-          future: canOpenCameraView(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (snapshot.hasData && snapshot.data == true) {
-              return Stack(
-                children: <Widget>[
-                  ScanImageView(
-                    child: RScanView(
-                      controller: _controller,
-                    ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: FutureBuilder<bool>(
+        future: canOpenCameraView(),
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.hasData && snapshot.data == true) {
+            return Stack(
+              children: <Widget>[
+                ScanImageView(
+                  child: RScanView(
+                    controller: _controller,
                   ),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: FutureBuilder(
-                        future: getFlashMode(),
-                        builder: _buildFlashBtn,
-                      ))
-                ],
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
+                ),
+                Align(
+                    alignment: Alignment.bottomCenter,
+                    child: FutureBuilder(
+                      future: getFlashMode(),
+                      builder: _buildFlashBtn,
+                    ))
+              ],
+            );
+          } else {
+            return Container();
+          }
+        },
       ),
     );
   }

@@ -1,3 +1,5 @@
+## 0.1.4 add RScanCamera.
+
 ## 0.1.3 add the barcode type and the point in result.
 
 ## 0.1.2 fix android camera draw.

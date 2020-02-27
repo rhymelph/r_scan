@@ -11,7 +11,7 @@ import java.util.Map;
 public class RScanResultUtils {
 
 
-    static Map<String,Object> toMap(Result result){
+    public static Map<String,Object> toMap(Result result){
         if(result == null) return  null;
         Map<String,Object> data = new HashMap<>();
         data.put("message",result.getText());

@@ -5,6 +5,3 @@
 .pub/
 
 build/
-
-lib/generated/
-res/

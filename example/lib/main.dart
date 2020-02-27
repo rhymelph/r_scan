@@ -1,13 +1,24 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:r_scan_example/camera_dialog.dart';
 import 'package:r_scan_example/scan_dialog.dart';
+import 'scan_camera_dialog.dart';
 import 'package:r_scan/r_scan.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  cameras = await availableCameras();
+  rScanCameras = await availableRScanCameras();
+  print('返回可用的相机：${rScanCameras.join('\n')}');
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -98,6 +109,29 @@ class _MyPageState extends State<MyPage> {
                 });
               },
               child: Text('内存图片解析'),
+            ),
+          ),
+          Center(
+            child: FlatButton(
+              onPressed: () async {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => CameraDialog()));
+              },
+              child: Text('官方相机'),
+            ),
+          ),
+          Center(
+            child: FlatButton(
+              onPressed: () async {
+                final result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            RScanCameraDialog()));
+                setState(() {
+                  this.result = result;
+                });
+              },
+              child: Text('new开始扫码'),
             ),
           ),
         ],

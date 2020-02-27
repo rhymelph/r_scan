@@ -32,14 +32,14 @@
 - (instancetype)initWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId arguments:(id)args binaryMessenger:(NSObject<FlutterBinaryMessenger> *)messenger{
     if(self = [super initWithFrame:frame]){
         
-       NSString * channelName=[NSString stringWithFormat:@"r_scan/com.rhyme/r_scan_view_%lld/method",viewId];
+       NSString * channelName=[NSString stringWithFormat:@"com.rhyme_lph/r_scan_view_%lld/method",viewId];
         self._channel=[FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:messenger];
         __weak __typeof__(self) weakSelf = self;
         [weakSelf._channel setMethodCallHandler:^(FlutterMethodCall * _Nonnull call, FlutterResult  _Nonnull result) {
             [weakSelf onMethodCall:call result:result];
         }];
         
-        NSString * eventChannelName=[NSString stringWithFormat:@"r_scan/com.rhyme/r_scan_view_%lld/event",viewId];
+        NSString * eventChannelName=[NSString stringWithFormat:@"com.rhyme_lph/r_scan_view_%lld/event",viewId];
         FlutterEventChannel * _evenChannel = [FlutterEventChannel eventChannelWithName:eventChannelName binaryMessenger:messenger];
         self._event=[FlutterRScanViewEventChannel new];
 //        [self._event setRsView:self];

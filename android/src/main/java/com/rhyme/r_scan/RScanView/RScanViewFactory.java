@@ -1,4 +1,4 @@
-package com.rhyme.r_scan;
+package com.rhyme.r_scan.RScanView;
 
 import android.content.Context;
 
@@ -10,7 +10,7 @@ import io.flutter.plugin.platform.PlatformViewFactory;
 public class RScanViewFactory extends PlatformViewFactory {
     private final BinaryMessenger messenger;
 
-    public RScanViewFactory(BinaryMessenger messenger) {
+    RScanViewFactory(BinaryMessenger messenger) {
         super(StandardMessageCodec.INSTANCE);
         this.messenger=messenger;
     }

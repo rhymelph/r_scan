@@ -1,8 +1,7 @@
-package com.rhyme.r_scan;
+package com.rhyme.r_scan.RScanView;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Rational;
@@ -18,6 +17,7 @@ import androidx.camera.core.ImageAnalysisConfig;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
+import androidx.camera.core.SessionConfig;
 import androidx.camera.core.UseCase;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
@@ -28,6 +28,7 @@ import com.google.zxing.MultiFormatReader;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
+import com.rhyme.r_scan.RScanResultUtils;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -44,20 +45,19 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
     private LifecycleRegistry lifecycleRegistry;
     private TextureView textureView;
     private boolean isPlay;
-    private static final String scanViewType = "com.rhyme/r_scan_view";
+    private static final String scanViewType = "com.rhyme_lph/r_scan_view";
     private EventChannel.EventSink eventSink;
     private long lastCurrentTimestamp = 0L;//最后一次的扫描
-    private MethodChannel methodChannel;
     private Preview mPreview;
 
-    public FlutterRScanView(Context context, BinaryMessenger messenger, int i, Object o) {
+    FlutterRScanView(Context context, BinaryMessenger messenger, int i, Object o) {
         Map map = (Map) o;
         Boolean _isPlay = (Boolean) map.get("isPlay");
         isPlay = _isPlay == Boolean.TRUE;
 
-        new EventChannel(messenger, "r_scan/" + scanViewType + "_" + i + "/event")
+        new EventChannel(messenger, scanViewType + "_" + i + "/event")
                 .setStreamHandler(this);
-        methodChannel = new MethodChannel(messenger, "r_scan/" + scanViewType + "_" + i + "/method");
+        MethodChannel methodChannel = new MethodChannel(messenger, scanViewType + "_" + i + "/method");
         methodChannel.setMethodCallHandler(this);
         textureView = new TextureView(context);
         lifecycleRegistry = new LifecycleRegistry(this);
@@ -92,7 +92,7 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
     }
 
     @Override
-    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+    public void onMethodCall(MethodCall methodCall, @NonNull MethodChannel.Result result) {
         switch (methodCall.method) {
             case "startScan":
                 isPlay = true;
@@ -103,8 +103,8 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
                 result.success(null);
                 break;
             case "setFlashMode":
-                boolean isOpen = methodCall.argument("isOpen");
-                mPreview.enableTorch(isOpen);
+                Boolean isOpen = methodCall.<Boolean>argument("isOpen");
+                mPreview.enableTorch(isOpen == Boolean.TRUE);
                 result.success(true);
                 break;
             case "getFlashMode":
@@ -125,6 +125,7 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
     @NonNull
     @Override
     public Lifecycle getLifecycle() {
+        Log.d("CameraX", "getLifecycle" + lifecycleRegistry.getCurrentState().name());
         return lifecycleRegistry;
     }
 
@@ -185,12 +186,12 @@ public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChan
                 BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
                 try {
                     final Result decode = reader.decode(binaryBitmap);
-                    if (decode != null&&eventSink!=null) {
+                    if (decode != null && eventSink != null) {
                         textureView.post(new Runnable() {
                             @Override
                             public void run() {
-                                if (eventSink!=null)
-                                eventSink.success(RScanResultUtils.toMap(decode));
+                                if (eventSink != null)
+                                    eventSink.success(RScanResultUtils.toMap(decode));
                             }
                         });
                     }

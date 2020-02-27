@@ -1,17 +1,23 @@
 #import "RScanPlugin.h"
 #import "FlutterRScanView.h"
 #import "RScanResult.h"
-
+#import "RScanCamera.h"
 @implementation RScanPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
-                                     methodChannelWithName:@"r_scan"
+                                     methodChannelWithName:@"com.rhyme_lph/r_scan"
                                      binaryMessenger:[registrar messenger]];
     RScanPlugin* instance = [[RScanPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
     
     FlutterRScanViewFactory * rScanView=[[FlutterRScanViewFactory alloc]initWithMessenger:registrar.messenger];
-    [registrar registerViewFactory:rScanView withId:@"com.rhyme/r_scan_view"];
+    [registrar registerViewFactory:rScanView withId:@"com.rhyme_lph/r_scan_view"];
+    
+    FlutterMethodChannel* cameraChannel = [FlutterMethodChannel
+                                           methodChannelWithName:@"com.rhyme_lph/r_scan_camera/method" binaryMessenger:[registrar messenger]];
+    
+    RScanCamera* camera = [[RScanCamera alloc]initWithRegistry:[registrar textures] messenger:[registrar messenger]];
+    [registrar addMethodCallDelegate:camera channel:cameraChannel];
     
 }
 

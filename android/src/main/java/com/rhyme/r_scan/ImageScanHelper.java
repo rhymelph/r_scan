@@ -4,33 +4,21 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.Camera;
 import android.os.Handler;
 import android.util.Log;
 
-import androidx.annotation.UiThread;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
-import com.google.zxing.common.GlobalHistogramBinarizer;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.EnumMap;
@@ -38,10 +26,8 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -61,6 +47,10 @@ public class ImageScanHelper extends ContextWrapper {
 
     public void scanImagePath(MethodCall call, final MethodChannel.Result result) {
         final String path = call.argument("path");
+        if(path == null){
+            result.error("1001","please enter your file path",null);
+            return;
+        }
         final File file = new File(path);
         if (file.isFile()) {
             executor.execute(new Runnable() {
@@ -106,6 +96,10 @@ public class ImageScanHelper extends ContextWrapper {
 
     public void scanImageUrl(MethodCall call, final MethodChannel.Result result) {
         final String url = call.argument("url");
+        if(url == null){
+            result.error("1002","please enter your url",null);
+            return;
+        }
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -167,11 +161,14 @@ public class ImageScanHelper extends ContextWrapper {
 
     public void scanImageMemory(MethodCall call, final MethodChannel.Result result) {
         final byte[] uint8list = call.argument("uint8list");
+        if (uint8list == null){
+            result.error("1003","uint8list is not null",null);
+            return;
+        }
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    assert uint8list != null;
                     Bitmap bitmap;
                     bitmap = BitmapFactory.decodeByteArray(uint8list,0,uint8list.length);
                     int height = bitmap.getHeight();
