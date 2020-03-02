@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugins.camera.Camera;
-
 public class CameraUtils {
 
     public static List<Map<String, Object>> getAvailableCameras(Activity activity)
