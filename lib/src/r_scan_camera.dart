@@ -99,6 +99,14 @@ class RScanCameraController extends ValueNotifier<RScanCameraValue> {
   Future<bool> getFlashMode() async =>
       await _channel.invokeMethod('getFlashMode');
 
+  /// flash auto open when brightness value less then 600.
+  ///
+  /// [isAuto] auto
+  Future<bool> setAutoFlashMode(bool isAuto) async =>
+      await _channel.invokeMethod('setAutoFlashMode', {
+        'isAuto': isAuto,
+      });
+
   @override
   Future<void> dispose() async {
     if (_isDisposed) {

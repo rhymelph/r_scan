@@ -91,6 +91,15 @@ public class RScanCameraMethodHandler implements MethodChannel.MethodCallHandler
                 }
                 result.success(null);
                 break;
+            case "setAutoFlashMode":
+                Boolean isAuto = call.<Boolean>argument("isAuto");
+                if (rScanCamera != null) {
+                    rScanCamera.setAutoFlash(isAuto == Boolean.TRUE);
+                    result.success(true);
+                } else {
+                    result.success(true);
+                }
+                break;
             case "setFlashMode":
                 Boolean isOpen = call.<Boolean>argument("isOpen");
                 if (rScanCamera != null) {
@@ -100,7 +109,7 @@ public class RScanCameraMethodHandler implements MethodChannel.MethodCallHandler
                         e.printStackTrace();
                     }
                     result.success(true);
-                }else {
+                } else {
                     result.success(true);
                 }
                 break;
@@ -111,8 +120,7 @@ public class RScanCameraMethodHandler implements MethodChannel.MethodCallHandler
                     result.success(false);
                 }
                 break;
-            case "dispose":
-            {
+            case "dispose": {
                 if (rScanCamera != null) {
                     rScanCamera.dispose();
                 }
