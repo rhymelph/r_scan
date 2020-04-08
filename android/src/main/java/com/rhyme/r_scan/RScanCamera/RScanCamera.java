@@ -27,8 +27,10 @@ import androidx.annotation.NonNull;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.Result;
+import com.google.zxing.common.GlobalHistogramBinarizer;
 import com.google.zxing.common.HybridBinarizer;
 
 import java.nio.ByteBuffer;
@@ -64,7 +66,14 @@ class RScanCamera {
     private long lastCurrentTimestamp = 0L;//最后一次的扫描
     private Handler handler = new Handler();
     private Executor executor = Executors.newSingleThreadExecutor();
-    private boolean isOpenFlash = false;
+    private boolean isAutoOpenFlash = false;
+
+    // 上次环境亮度记录的索引
+    private int mAmbientBrightnessDarkIndex = 0;
+    // 环境亮度历史记录的数组，255 是代表亮度最大值
+    private static final long[] AMBIENT_BRIGHTNESS_DARK_LIST = new long[]{255, 255, 255, 255};
+    // 亮度低的阀值
+    private static final int AMBIENT_BRIGHTNESS_DARK = 600;
 
     void startScan() {
         isPlay = true;
@@ -75,18 +84,23 @@ class RScanCamera {
     }
 
     void enableTorch(boolean b) throws CameraAccessException {
-       if(b){
-           captureRequestBuilder.set(
-                   CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
-           cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null);
+        if (b) {
+            captureRequestBuilder.set(
+                    CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+            cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null);
 
-       }else {
-           captureRequestBuilder.set(
-                   CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
-           cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null);
+        } else {
+            captureRequestBuilder.set(
+                    CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+            cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null);
 
-       }
+        }
     }
+
+    void setAutoFlash(boolean b) {
+        isAutoOpenFlash = b;
+    }
+
 
     boolean isTorchOn() {
         try {
@@ -124,23 +138,6 @@ class RScanCamera {
         //获取预览大小
         ResolutionPreset preset = ResolutionPreset.valueOf(resolutionPreset);
         previewSize = computeBestPreviewSize(cameraName, preset);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            cameraManager.registerTorchCallback(new CameraManager.TorchCallback() {
-                @Override
-                public void onTorchModeUnavailable(@NonNull String cameraId) {
-                    super.onTorchModeUnavailable(cameraId);
-                }
-
-                @Override
-                public void onTorchModeChanged(@NonNull String cameraId, boolean enabled) {
-                    super.onTorchModeChanged(cameraId, enabled);
-                    if (cameraId.equals(cameraName)) {
-                        isOpenFlash = enabled;
-                    }
-                }
-            }, null);
-        }
 
     }
 
@@ -278,6 +275,95 @@ class RScanCamera {
         startPreviewWithImageStream();
     }
 
+    private void setAutoOpenFlash(int width, int height, byte[] array) {
+        if (!isAutoOpenFlash) return;
+        //像素点的总亮度
+        long pixelLightCount = 0L;
+        //像素点总数
+        long pixelCount = width * height;
+        //采集步长
+        int step = 10;
+//        if(Math.abs(array.length - pixelCount * 1.5f) < 0.00001f){
+        for (int i = 0; i < pixelCount; i++) {
+            pixelLightCount += (long) array[i] & 0xFFL;
+        }
+        long cameraLight = pixelLightCount / (pixelCount / step);
+        int lightSize = AMBIENT_BRIGHTNESS_DARK_LIST.length;
+        AMBIENT_BRIGHTNESS_DARK_LIST[mAmbientBrightnessDarkIndex = mAmbientBrightnessDarkIndex % lightSize] = cameraLight;
+        mAmbientBrightnessDarkIndex++;
+        boolean isDarkEnv = true;
+        // 判断在时间范围 AMBIENT_BRIGHTNESS_WAIT_SCAN_TIME * lightSize 内是不是亮度过暗
+        for (long ambientBrightness : AMBIENT_BRIGHTNESS_DARK_LIST) {
+            if (ambientBrightness > AMBIENT_BRIGHTNESS_DARK) {
+                isDarkEnv = false;
+                break;
+            }
+        }
+        Log.d(TAG, "decodeImage: light:" + cameraLight);
+        if (isDarkEnv && !isTorchOn()) {
+            try {
+                enableTorch(Boolean.TRUE);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        }
+//        }
+    }
+
+    private Result decodeImage(Image image) {
+        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+        byte[] array = new byte[buffer.remaining()];
+        buffer.get(array);
+
+        //图片宽度
+        int width = image.getWidth();
+        //图片高度
+        int height = image.getHeight();
+
+        setAutoOpenFlash(width, height, array);
+
+        PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(array,
+                width,
+                height,
+                0,
+                0,
+                width,
+                height,
+                false);
+        BinaryBitmap binaryBitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
+        try {
+            return reader.decode(binaryBitmap);
+        } catch (Exception e) {
+            binaryBitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
+            try {
+                return reader.decode(binaryBitmap);
+            } catch (NotFoundException ex) {
+//                ex.printStackTrace();
+            }
+//            Log.d(TAG, "decodeImage: rotate45");
+//            binaryBitmap = binaryBitmap.rotateCounterClockwise45();
+//            try {
+//                return reader.decodeWithState(binaryBitmap);
+//            } catch (NotFoundException ex) {
+//                Log.d(TAG, "decodeImage: rotate90");
+//                //          Log.d(TAG, "analyze: error ");
+//                binaryBitmap = binaryBitmap.rotateCounterClockwise45();
+//                try {
+//                    return reader.decodeWithState(binaryBitmap);
+//                } catch (NotFoundException ex2) {
+//                    //          Log.d(TAG, "analyze: error ");
+//
+//                }
+//            }
+//          Log.d(TAG, "analyze: error ");
+        } finally {
+            buffer.clear();
+            reader.reset();
+        }
+        return null;
+    }
+
+
     private void startPreviewWithImageStream()
             throws CameraAccessException {
         createCaptureSession(imageStreamReader.getSurface());
@@ -296,33 +382,14 @@ class RScanCamera {
                                 Log.d(TAG, "analyze: " + image.getFormat());
                                 return;
                             }
-                            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                            byte[] array = new byte[buffer.remaining()];
-                            buffer.get(array);
-                            int height = image.getHeight();
-                            int width = image.getWidth();
-                            PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(array,
-                                    width,
-                                    height,
-                                    0,
-                                    0,
-                                    width,
-                                    height,
-                                    false);
-                            BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-                            try {
-                                final Result decode = reader.decode(binaryBitmap);
-                                if (decode != null) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            rScanMessenger.send(decode);
-                                        }
-                                    });
-                                }
-                            } catch (Exception e) {
-                                buffer.clear();
-//                                Log.d(TAG, "analyze: error ");
+                            final Result result = decodeImage(image);
+                            if (result != null) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        rScanMessenger.send(result);
+                                    }
+                                });
                             }
                             lastCurrentTimestamp = currentTimestamp;
                             image.close();

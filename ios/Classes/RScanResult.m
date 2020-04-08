@@ -48,4 +48,85 @@
     }
 }
 
++(NSNumber*) getZXingType:(ZXBarcodeFormat)format{
+    switch (format) {
+        case kBarcodeFormatAztec:
+            return @(0);
+        case kBarcodeFormatCodabar:
+            return @(1);
+        case kBarcodeFormatCode39:
+            return @(2);
+        case kBarcodeFormatCode93:
+            return @(3);
+        case kBarcodeFormatCode128:
+            return @(4);
+        case kBarcodeFormatDataMatrix:
+            return @(5);
+        case kBarcodeFormatEan8:
+            return @(6);
+        case kBarcodeFormatEan13:
+            return @(7);
+        case kBarcodeFormatITF:
+            return @(8);
+        case kBarcodeFormatMaxiCode:
+            return @(9);
+        case kBarcodeFormatPDF417:
+            return @(10);
+        case kBarcodeFormatQRCode:
+            return @(11);
+        case kBarcodeFormatRSS14:
+            return @(12);
+        case kBarcodeFormatRSSExpanded:
+            return @(13);
+        case kBarcodeFormatUPCA:
+            return @(14);
+        case kBarcodeFormatUPCE:
+            return @(15);
+        case kBarcodeFormatUPCEANExtension:
+            return @(16);
+    }
+    return nil;
+}
+
++ (NSNumber *)getZBarType:(zbar_symbol_type_t)format{
+    switch (format) {
+//        case kBarcodeFormatAztec:
+//            return @(0);
+        case ZBAR_CODABAR:
+            return @(1);
+        case ZBAR_CODE39:
+            return @(2);
+        case ZBAR_CODE93:
+            return @(3);
+        case ZBAR_CODE128:
+            return @(4);
+        case ZBAR_DATABAR_EXP:
+            return @(5);
+        case ZBAR_EAN8:
+            return @(6);
+        case ZBAR_EAN13:
+            return @(7);
+        case ZBAR_COMPOSITE:
+            return @(8);
+//        case kBarcodeFormatMaxiCode:
+//            return @(9);
+        case ZBAR_PDF417:
+            return @(10);
+        case ZBAR_QRCODE:
+            return @(11);
+//        case kBarcodeFormatRSS14:
+//            return @(12);
+//        case kBarcodeFormatRSSExpanded:
+//            return @(13);
+        case ZBAR_UPCA:
+            return @(14);
+        case ZBAR_UPCE:
+            return @(15);
+//        case kBarcodeFormatUPCEANExtension:
+//            return @(16);
+        default:
+            break;
+    }
+    return nil;
+}
 @end

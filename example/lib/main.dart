@@ -11,9 +11,6 @@ import 'package:r_scan/r_scan.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  rScanCameras = await availableRScanCameras();
-  print('返回可用的相机：${rScanCameras.join('\n')}');
-
   runApp(MyApp());
 }
 

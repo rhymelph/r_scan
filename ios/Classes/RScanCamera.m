@@ -118,9 +118,17 @@ FourCharCode const rScanVideoFormat = kCVPixelFormatType_32BGRA;
     [_captureSession addOutputWithNoConnections:_captureVideoOutput];
     
     _captureOutput=[[AVCaptureMetadataOutput alloc]init];
+
+    
+    //设置代理，在主线程刷新
     [_captureOutput setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
     [_captureSession addOutput:_captureOutput];
     _captureOutput.metadataObjectTypes=_captureOutput.availableMetadataObjectTypes;
+    //扫码区域的大小
+    AVCaptureVideoPreviewLayer *layer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
+    layer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+//    layer.frame = CGRectMake(left, top, size, size);
+//        [_captureOutput rectOfInterest];
     [_captureOutput setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
     [_captureOutput setMetadataObjectTypes:@[AVMetadataObjectTypeAztecCode,AVMetadataObjectTypeCode39Code,
                                      AVMetadataObjectTypeCode93Code,AVMetadataObjectTypeCode128Code, AVMetadataObjectTypeDataMatrixCode,AVMetadataObjectTypeEAN8Code,AVMetadataObjectTypeEAN13Code,AVMetadataObjectTypeITF14Code,AVMetadataObjectTypePDF417Code,AVMetadataObjectTypeQRCode,AVMetadataObjectTypeUPCECode]];
@@ -194,6 +202,7 @@ FourCharCode const rScanVideoFormat = kCVPixelFormatType_32BGRA;
             _eventSink([RScanResult toMap:metaObject]);
         }
     }
+
 }
 
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
