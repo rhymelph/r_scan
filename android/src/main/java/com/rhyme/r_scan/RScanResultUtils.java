@@ -20,8 +20,8 @@ public class RScanResultUtils {
             List<Map<String,Object>>  resultPoints = new ArrayList<>();
             for (ResultPoint point :result.getResultPoints()){
                 Map<String,Object> pointMap = new HashMap<>();
-                pointMap.put("x",point.getX());
-                pointMap.put("y",point.getY());
+                pointMap.put("X",point.getX());
+                pointMap.put("Y",point.getY());
                 resultPoints.add(pointMap);
             }
             data.put("points",resultPoints);
