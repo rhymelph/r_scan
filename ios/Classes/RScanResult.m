@@ -6,8 +6,6 @@
 //
 
 #import "RScanResult.h"
-#import "ZXingObjC.h"
-#import "ZBarSDK.h"
 @implementation RScanResult
 
 +(NSDictionary*) toMap:(AVMetadataMachineReadableCodeObject*) obj{
