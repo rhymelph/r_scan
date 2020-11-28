@@ -442,6 +442,14 @@ class RScanCamera {
             }}, handler);
     }
 
+    private byte[] getRotatedData(byte[] data, int width, int height) {
+        byte[] rotatedData = new byte[data.length];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++)
+                rotatedData[x * height + height - y - 1] = data[x + y * width];
+        }
+        return rotatedData;
+    }
 
     private void closeCaptureSession() {
         if (cameraCaptureSession != null) {
