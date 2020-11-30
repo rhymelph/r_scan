@@ -6,7 +6,6 @@
 //
 
 #import "RScanResult.h"
-
 @implementation RScanResult
 
 +(NSDictionary*) toMap:(AVMetadataMachineReadableCodeObject*) obj{

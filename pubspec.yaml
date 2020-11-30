@@ -1,5 +1,5 @@
 name: r_scan
-description: A flutter plugin about qr code scan,it can scan from file、url、memory and camera qr code.
+description: A flutter plugin about qr code scan,it can scan from file, url, memory and camera qr code.
 version: 0.1.4+2
 homepage: https://github.com/rhymelph/r_scan
 

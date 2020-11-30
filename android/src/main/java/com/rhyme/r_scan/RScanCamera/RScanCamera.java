@@ -364,7 +364,7 @@ class RScanCamera {
     }
 
 
-    private void startPreviewWithImageStream()
+    private synchronized void startPreviewWithImageStream()
             throws CameraAccessException {
         createCaptureSession(imageStreamReader.getSurface());
 
@@ -382,26 +382,74 @@ class RScanCamera {
                                 Log.d(TAG, "analyze: " + image.getFormat());
                                 return;
                             }
-                            final Result result = decodeImage(image);
-                            if (result != null) {
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        rScanMessenger.send(result);
+                            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                            byte[] array = new byte[buffer.remaining()];
+                            buffer.get(array);
+                            int height = image.getHeight();
+                            int width = image.getWidth();
+                            //优先图片翻转解析（主要解决习惯性竖屏扫条码问题，二维码不受影响）
+                            PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(getRotatedData(array, width, height),
+                                    height,
+                                    width,
+                                    0,
+                                    0,
+                                    height,
+                                    width,
+                                    true);
+                            BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+                            try {
+                                final Result decode = reader.decode(binaryBitmap);
+                                if (decode != null) {
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            rScanMessenger.send(decode);
+                                        }
+                                    });
+                                }
+                            } catch (NotFoundException e) {
+                                //原图解析
+                                source = new PlanarYUVLuminanceSource(array,
+                                        width,
+                                        height,
+                                        0,
+                                        0,
+                                        width,
+                                        height,
+                                        false);
+                                binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+                                try {
+                                    final Result decode = reader.decode(binaryBitmap);
+                                    if (decode != null) {
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                rScanMessenger.send(decode);
+                                            }
+                                        });
                                     }
-                                });
+                                } catch (Exception e1) {
+                                    buffer.clear();
+                                }
+                            } catch (Exception e) {
+                                buffer.clear();
                             }
                             lastCurrentTimestamp = currentTimestamp;
                             image.close();
                         }
                     }
-
                 });
-            }
-        }, handler);
-
+            }}, handler);
     }
 
+    private byte[] getRotatedData(byte[] data, int width, int height) {
+        byte[] rotatedData = new byte[data.length];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++)
+                rotatedData[x * height + height - y - 1] = data[x + y * width];
+        }
+        return rotatedData;
+    }
 
     private void closeCaptureSession() {
         if (cameraCaptureSession != null) {
