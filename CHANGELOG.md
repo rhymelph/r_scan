@@ -1,3 +1,5 @@
+## 0.1.5 fix ssl and rotate scan problem.
+
 ## 0.1.4+2 fix point problem.
 
 ## 0.1.4 add RScanCamera.
