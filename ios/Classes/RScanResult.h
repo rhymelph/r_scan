@@ -7,8 +7,8 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "ZXingObjC.h"
-#import "ZBarSDK.h"
+#import "ZXingObjC/ZXingObjC.h"
+#import "ZBarSDK/ZBarSDK.h"
 @interface RScanResult : NSObject
 
 +(NSDictionary*) toMap:(AVMetadataMachineReadableCodeObject*) obj;
