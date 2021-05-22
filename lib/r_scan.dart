@@ -95,21 +95,19 @@ class RScanPoint {
 /// scan result
 class RScanResult {
   /// barcode type
-  final RScanBarType type;
+  final RScanBarType? type;
 
   ///barcode message
-  final String message;
+  final String? message;
 
   ///barcode points
-  final List<RScanPoint> points;
+  final List<RScanPoint>? points;
 
   const RScanResult({this.type, this.message, this.points});
 
-  factory RScanResult.formMap(Map map) {
-    return map == null
-        ? null
-        : RScanResult(
-            type: map['type'] != null
+  factory RScanResult.formMap(Map<String, dynamic>? map) {
+    return RScanResult(
+            type: map!['type'] != null
                 ? RScanBarType.values[map['type'] as int]
                 : null,
             message: map['message'] as String,
