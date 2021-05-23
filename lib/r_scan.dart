@@ -105,7 +105,7 @@ class RScanResult {
 
   const RScanResult({this.type, this.message, this.points});
 
-  factory RScanResult.formMap(Map<String, dynamic>? map) {
+  factory RScanResult.formMap(Map? map) {
     return RScanResult(
             type: map!['type'] != null
                 ? RScanBarType.values[map['type'] as int]

@@ -12,9 +12,9 @@ final MethodChannel _channel = const MethodChannel('$_scanType/method');
 
 Future<List<RScanCameraDescription>> availableRScanCameras() async {
   try {
-    final List<Map<dynamic, dynamic>> cameras = await (_channel
-        .invokeListMethod<Map<dynamic, dynamic>>('availableCameras') as FutureOr<List<Map<dynamic, dynamic>>>);
-    return cameras.map((Map<dynamic, dynamic> camera) {
+    final List<Map<dynamic, dynamic>>? cameras = await (_channel
+        .invokeListMethod<Map<dynamic, dynamic>>('availableCameras') as FutureOr<List<Map<dynamic, dynamic>>?>);
+    return cameras!.map((Map<dynamic, dynamic> camera) {
       return RScanCameraDescription(
         name: camera['name'],
         lensDirection: _parseCameraLensDirection(camera['lensFacing']),
@@ -119,7 +119,7 @@ class RScanCameraController extends ValueNotifier<RScanCameraValue> {
       await _channel.invokeMethod('dispose', <String, dynamic>{
         'textureId': _textureId,
       });
-      await _resultSubscription?.cancel();
+      await _resultSubscription.cancel();
     }
   }
 }
