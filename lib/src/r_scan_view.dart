@@ -18,14 +18,14 @@ typedef void ScanResultCallback(String result);
 class RScanView extends StatefulWidget {
   final RScanController controller;
 
-  const RScanView({this.controller}) : assert(controller != null);
+  const RScanView({required this.controller}) : assert(controller != null);
 
   @override
   State<StatefulWidget> createState() => _RScanViewState();
 }
 
 class _RScanViewState extends State<RScanView> {
-  RScanController _controller;
+  late RScanController _controller;
 
   void onPlatformViewCreated(int id) {
     _controller.attach(id);
@@ -34,7 +34,7 @@ class _RScanViewState extends State<RScanView> {
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? RScanController();
+    _controller = widget.controller;
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
   }
 
@@ -78,12 +78,12 @@ class _RScanViewState extends State<RScanView> {
 /// can startScan or stopScan .
 @Deprecated("please use 'RScanCameraController'")
 class RScanController extends ChangeNotifier {
-  Stream _stream;
-  StreamSubscription _subscription;
-  RScanResult result;
-  EventChannel _channel;
+  late Stream _stream;
+  StreamSubscription? _subscription;
+  RScanResult? result;
+  late EventChannel _channel;
   bool isPlay;
-  MethodChannel _methodChannel;
+  late MethodChannel _methodChannel;
 
   RScanController({this.isPlay: true})
       : assert(isPlay != null),
@@ -118,7 +118,7 @@ class RScanController extends ChangeNotifier {
   /// [isOpen] if false will close flash mode.
   ///
   /// It will return is success.
-  Future<bool> setFlashMode(bool isOpen) async =>
+  Future<bool?> setFlashMode(bool isOpen) async =>
       await _methodChannel.invokeMethod('setFlashMode', {
         'isOpen': isOpen,
       });
@@ -128,7 +128,7 @@ class RScanController extends ChangeNotifier {
   /// [isOpen] if false will close flash mode.
   ///
   /// It will return is success.
-  Future<bool> getFlashMode() async =>
+  Future<bool?> getFlashMode() async =>
       await _methodChannel.invokeMethod('getFlashMode');
 
   void detach() {

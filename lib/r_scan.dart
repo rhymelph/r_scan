@@ -68,10 +68,10 @@ enum RScanBarType {
 /// barcode point
 class RScanPoint {
   /// barcode point x
-  final double x;
+  final double? x;
 
   /// barcode point y
-  final double y;
+  final double? y;
 
   RScanPoint(this.x, this.y);
 
@@ -95,24 +95,24 @@ class RScanPoint {
 /// scan result
 class RScanResult {
   /// barcode type
-  final RScanBarType type;
+  final RScanBarType? type;
 
   ///barcode message
-  final String message;
+  final String? message;
 
   ///barcode points
-  final List<RScanPoint> points;
+  final List<RScanPoint>? points;
 
   const RScanResult({this.type, this.message, this.points});
 
-  factory RScanResult.formMap(Map map) {
+  factory RScanResult.formMap(Map? map) {
     return map == null
-        ? null
+        ? RScanResult()
         : RScanResult(
             type: map['type'] != null
                 ? RScanBarType.values[map['type'] as int]
                 : null,
-            message: map['message'] as String,
+            message: map['message'] as String?,
             points: map['points'] != null
                 ? (map['points'] as List)
                     .map(
