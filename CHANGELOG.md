@@ -1,4 +1,5 @@
-## 0.1.5 sound null safety and WKWebView.
+## 0.1.6+1 fix issues #52.
+## 0.1.6 sound null safety and WKWebView.
 
 ## 0.1.5 fix ssl and rotate scan problem.
 
