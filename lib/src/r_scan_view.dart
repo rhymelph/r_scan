@@ -35,7 +35,7 @@ class _RScanViewState extends State<RScanView> {
   void initState() {
     super.initState();
     _controller = widget.controller;
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
   }
 
   @override
